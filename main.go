@@ -75,19 +75,22 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	ds := dialect.Insert("items").Rows(
-		ideresp.ElementList,
-	)
-	insertSQL, args, _ := ds.ToSQL()
-	fmt.Println(insertSQL, args)
-	rows, err := pgDB.Query(insertSQL)
-	if err != nil {
-		panic(err)
+
+	for i := 1; i < 2; i++ {
+		ideresp := fetchIde(token, i)
+		ds := dialect.Insert("items").Rows(
+			ideresp.ElementList,
+		)
+		insertSQL, _, _ := ds.ToSQL()
+		rows, err := pgDB.Query(insertSQL)
+		if err != nil {
+			panic(err)
+		}
+		rows.Close()
 	}
-	rows.Close()
 }
 
-func fetchIde(authtoken string) api.IdeResp {
+func fetchIde(authtoken string, idx int) api.IdeResp {
 	var dump api.IdeResp
 	client := resty.New()
 	client.R().
@@ -106,6 +109,7 @@ func fetchIde(authtoken string) api.IdeResp {
 			"maxPrice":     "850000.0",
 			"order":        "modificationDate",
 			"sort":         "asc",
+			"numPage":      fmt.Sprint(idx),
 		}).
 		Post("https://api.idealista.com/3.5/es/search")
 	return dump
