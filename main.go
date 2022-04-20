@@ -24,6 +24,7 @@ type IdeTokenGen struct {
 }
 
 func generateToken() (token string, err error) {
+	fmt.Println("Generated a new token")
 	apikey, apikeyfound := os.LookupEnv("APIKEY")
 	secret, secretfound := os.LookupEnv("APISECRET")
 	if !apikeyfound || !secretfound {
@@ -45,7 +46,7 @@ func generateToken() (token string, err error) {
 		return "", err
 	}
 	fmt.Println(resp)
-	fmt.Println("Generated a new token")
+	fmt.Println(resp.Request)
 	return dump.ACCESSTOKEN, nil
 }
 
@@ -65,7 +66,8 @@ func main() {
 	//json.Unmarshal(byteValue, &dumpp)
 	//defer jsonFile.Close()
 	//fmt.Println("Found", len(dumpp.ElementList), "elements")
-	ideresp := fetchIde(token)
+
+	//ideresp := fetchIde(token)
 	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("DBUSER"), os.Getenv("DBPASSWORD"), os.Getenv("DBDBNAME"))
