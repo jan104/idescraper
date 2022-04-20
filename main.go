@@ -12,6 +12,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var GitCommit string = "undefined"
+var BuildTime string = "No Time provided"
+
 type IdeTokenGen struct {
 	ACCESSTOKEN string `json:"access_token"`
 	TOKENTYPE   string `json:"token_type"`
