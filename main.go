@@ -45,9 +45,40 @@ func generateToken() (token string, err error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(resp)
-	fmt.Println(resp.Request)
+	fmt.Println("Success:", resp.IsSuccess(), "Code:", resp.StatusCode())
 	return dump.ACCESSTOKEN, nil
+}
+
+func fetchIde(authtoken string, idx int) api.IdeResp {
+	fmt.Println("Fetch idealista property API")
+	var dump api.IdeResp
+	filtermap := map[string]string{
+		"center":       "28.1204,-16.7243",
+		"distance":     "5000",
+		"propertyType": "homes",
+		"operation":    "sale",
+		"country":      "es",
+		"locale":       "en",
+		"maxItems":     "50",
+		"minPrice":     "100000.0",
+		"maxPrice":     "850000.0",
+		"order":        "modificationDate",
+		"sort":         "asc",
+		"numPage":      fmt.Sprint(idx),
+	}
+	fmt.Println("Using these filters:", filtermap)
+	client := resty.New()
+	resp, err := client.R().
+		SetResult(&dump).
+		SetAuthToken(authtoken).
+		SetHeader("Content-Type", "multipart/form-data;").
+		SetFormData(filtermap).
+		Post("https://api.idealista.com/3.5/es/search")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Success:", resp.IsSuccess(), "Code:", resp.StatusCode())
+	return dump
 }
 
 func main() {
@@ -57,17 +88,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	//jsonFile, err := os.Open("run02-modDate-asc")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//var dumpp api.IdeResp
-	//byteValue, _ := ioutil.ReadAll(jsonFile)
-	//json.Unmarshal(byteValue, &dumpp)
-	//defer jsonFile.Close()
-	//fmt.Println("Found", len(dumpp.ElementList), "elements")
-
-	//ideresp := fetchIde(token)
 	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		os.Getenv("DBHOST"), os.Getenv("DBPORT"), os.Getenv("DBUSER"), os.Getenv("DBPASSWORD"), os.Getenv("DBDBNAME"))
@@ -88,29 +108,5 @@ func main() {
 		}
 		rows.Close()
 	}
-}
-
-func fetchIde(authtoken string, idx int) api.IdeResp {
-	var dump api.IdeResp
-	client := resty.New()
-	client.R().
-		SetResult(&dump).
-		SetAuthToken(authtoken).
-		SetHeader("Content-Type", "multipart/form-data;").
-		SetFormData(map[string]string{
-			"center":       "28.1204,-16.7243",
-			"distance":     "5000",
-			"propertyType": "homes",
-			"operation":    "sale",
-			"country":      "es",
-			"locale":       "en",
-			"maxItems":     "50",
-			"minPrice":     "100000.0",
-			"maxPrice":     "850000.0",
-			"order":        "modificationDate",
-			"sort":         "asc",
-			"numPage":      fmt.Sprint(idx),
-		}).
-		Post("https://api.idealista.com/3.5/es/search")
-	return dump
+	fmt.Println("Finished writing to DB")
 }
