@@ -16,7 +16,7 @@ type IdeResp struct {
 }
 
 type IdeElement struct {
-	PropertyCode      string  `json:"propertyCode" db:"propertycode"`
+	PropertyCode      int     `json:"propertyCode" db:"propertycode"`
 	Thumbnail         string  `json:"thumbnail,omitempty" db:"thumbnail"`
 	ExternalReference string  `json:"externalReference,omitempty" db:"externalreference"`
 	NumPhotos         int     `json:"numPhotos" db:"numphotos"`
