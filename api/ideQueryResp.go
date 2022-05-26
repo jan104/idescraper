@@ -45,22 +45,22 @@ type IdeElement struct {
 	HasLift           bool    `json:"hasLift,omitempty" db:"haslift"`
 	PriceByArea       float64 `json:"priceByArea" db:"pricebyarea"`
 	SuggestedTexts    struct {
-		Subtitle string `json:"subtitle" db:"suggestedtexts_subtitle"`
-		Title    string `json:"title" db:"suggestedtexts_title"`
-	} `json:"suggestedTexts" db:"-"`
+		Subtitle string `json:"subtitle" db:"subtitle"`
+		Title    string `json:"title" db:"title"`
+	} `json:"suggestedTexts" db:"suggestedtexts"`
 	HasPlan           bool `json:"hasPlan" db:"hasplan"`
 	Has3DTour         bool `json:"has3DTour" db:"has3dtour"`
 	Has360            bool `json:"has360" db:"has360"`
 	HasStaging        bool `json:"hasStaging" db:"hasstaging"`
 	TopNewDevelopment bool `json:"topNewDevelopment" db:"topnewdevelopment"`
 	ParkingSpace      struct {
-		HasParkingSpace               bool    `json:"hasParkingSpace" db:"parkingspace_hasparkingspace"`
-		IsParkingSpaceIncludedInPrice bool    `json:"isParkingSpaceIncludedInPrice" db:"parkingspace_isparkingspaceincludedinprice"`
-		ParkingSpacePrice             float64 `json:"parkingSpacePrice" db:"parkingspace_parkingspaceprice"`
-	} `json:"parkingSpace,omitempty" db:"-"`
+		HasParkingSpace               bool    `json:"hasParkingSpace" db:"hasparkingspace"`
+		IsParkingSpaceIncludedInPrice bool    `json:"isParkingSpaceIncludedInPrice" db:"isparkingspaceincludedinprice"`
+		ParkingSpacePrice             float64 `json:"parkingSpacePrice" db:"parkingspaceprice"`
+	} `json:"parkingSpace,omitempty" db:"parkingspace"`
 	Neighborhood string `json:"neighborhood,omitempty" db:"neighborhood"`
 	DetailedType struct {
-		Typology    string `json:"typology" db:"detailedtype_typology"`
-		SubTypology string `json:"subTypology" db:"detailedtype_subtypology"`
-	} `json:"detailedType,omitempty" db:"-"`
+		Typology    string `json:"typology" db:"typology"`
+		SubTypology string `json:"subTypology" db:"subtypology"`
+	} `json:"detailedType,omitempty" db:"detailedtype"`
 }
