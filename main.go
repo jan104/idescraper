@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
@@ -21,6 +22,40 @@ type IdeTokenGen struct {
 	EXPIRESEC   int    `json:"expires_in"`
 	SCOPE       string `json:"scope"`
 	JTI         string `json:"jti"`
+}
+
+var filtermap_circSmall = map[string]string{
+	// klein: 28.095092,-16.720768 r=3725m
+	"center":       "28.095092,-16.720768",
+	"distance":     "3725",
+	"propertyType": "homes",
+	"operation":    "sale",
+	"country":      "es",
+	"locale":       "en",
+	"maxItems":     "50",
+	"minPrice":     "200000.0",
+	"maxPrice":     "850000.0",
+	"order":        "modificationDate",
+	"sort":         "asc",
+	//"numPage": fmt.Sprint(idx),
+	"numPage": "1",
+}
+
+var filtermap_circBig = map[string]string{
+	// gros: 27.625749,-16.639058 r=50.000m
+	"center":       "27.625749,-16.639058",
+	"distance":     "50000",
+	"propertyType": "homes",
+	"operation":    "sale",
+	"country":      "es",
+	"locale":       "en",
+	"maxItems":     "50",
+	"minPrice":     "200000.0",
+	"maxPrice":     "850000.0",
+	"order":        "modificationDate",
+	"sort":         "asc",
+	//"numPage": fmt.Sprint(idx),
+	"numPage": "1",
 }
 
 func generateToken() (token string, err error) {
@@ -49,23 +84,9 @@ func generateToken() (token string, err error) {
 	return dump.ACCESSTOKEN, nil
 }
 
-func fetchIde(authtoken string, idx int) api.IdeResp {
+func fetchIde(authtoken string, idx int, filtermap map[string]string) api.IdeResp {
 	fmt.Println("Fetch idealista property API")
 	var dump api.IdeResp
-	filtermap := map[string]string{
-		"center":       "28.1204,-16.7243",
-		"distance":     "5000",
-		"propertyType": "homes",
-		"operation":    "sale",
-		"country":      "es",
-		"locale":       "en",
-		"maxItems":     "50",
-		"minPrice":     "100000.0",
-		"maxPrice":     "850000.0",
-		"order":        "modificationDate",
-		"sort":         "asc",
-		"numPage":      fmt.Sprint(idx),
-	}
 	fmt.Println("Using these filters:", filtermap)
 	client := resty.New()
 	resp, err := client.R().
@@ -77,7 +98,7 @@ func fetchIde(authtoken string, idx int) api.IdeResp {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Success:", resp.IsSuccess(), "Code:", resp.StatusCode())
+	fmt.Println("Success:", resp.IsSuccess(), "Code:", resp.StatusCode(), "Status:", resp.Status())
 	return dump
 }
 
@@ -97,16 +118,34 @@ func main() {
 	}
 
 	for i := 1; i < 2; i++ {
-		ideresp := fetchIde(token, i)
+		ideresp := fetchIde(token, i, filtermap_circSmall)
 		ds := dialect.Insert("items").Rows(
 			ideresp.ElementList,
 		)
 		insertSQL, _, _ := ds.ToSQL()
+		fmt.Println(insertSQL)
 		rows, err := pgDB.Query(insertSQL)
+		if err != nil {
+			panic(err)
+		}
+		rows.Close()
+
+		time.Sleep(2 * time.Second)
+
+		ideresp_big := fetchIde(token, i, filtermap_circBig)
+		ds = dialect.Insert("items").Rows(
+			ideresp_big.ElementList,
+		)
+		insertSQL, _, _ = ds.ToSQL()
+		rows, err = pgDB.Query(insertSQL)
 		if err != nil {
 			panic(err)
 		}
 		rows.Close()
 	}
 	fmt.Println("Finished writing to DB")
+	os.Exit(0)
 }
+
+// klein: 28.095092,-16.720768 r=3725m
+// gros: 27.625749,-16.639058 r=50.000m
