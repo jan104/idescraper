@@ -36,7 +36,7 @@ var filtermap_circSmall = map[string]string{
 	"minPrice":     "200000.0",
 	"maxPrice":     "850000.0",
 	"order":        "modificationDate",
-	"sort":         "asc",
+	"sort":         "desc",
 	//"numPage": fmt.Sprint(idx),
 	"numPage": "1",
 }
@@ -53,7 +53,7 @@ var filtermap_circBig = map[string]string{
 	"minPrice":     "200000.0",
 	"maxPrice":     "850000.0",
 	"order":        "modificationDate",
-	"sort":         "asc",
+	"sort":         "desc",
 	//"numPage": fmt.Sprint(idx),
 	"numPage": "1",
 }
