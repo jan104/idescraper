@@ -118,12 +118,13 @@ func main() {
 	}
 
 	for i := 1; i < 2; i++ {
-		ideresp := fetchIde(token, i, filtermap_circSmall)
+		ssmall := filtermap_circSmall
+		ssmall["numPage"] = fmt.Sprint(i)
+		ideresp := fetchIde(token, i, ssmall)
 		ds := dialect.Insert("items").Rows(
 			ideresp.ElementList,
 		)
 		insertSQL, _, _ := ds.ToSQL()
-		fmt.Println(insertSQL)
 		rows, err := pgDB.Query(insertSQL)
 		if err != nil {
 			panic(err)
@@ -132,7 +133,9 @@ func main() {
 
 		time.Sleep(2 * time.Second)
 
-		ideresp_big := fetchIde(token, i, filtermap_circBig)
+		bbig := filtermap_circBig
+		bbig["numPage"] = fmt.Sprint(i)
+		ideresp_big := fetchIde(token, i, bbig)
 		ds = dialect.Insert("items").Rows(
 			ideresp_big.ElementList,
 		)
@@ -142,6 +145,7 @@ func main() {
 			panic(err)
 		}
 		rows.Close()
+		time.Sleep(2 * time.Second)
 	}
 	fmt.Println("Finished writing to DB")
 	os.Exit(0)
