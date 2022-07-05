@@ -118,11 +118,16 @@ func main() {
 	}
 
 	for i := 1; i < 2; i++ {
+		// todo: filter auslagern und reverse als func
 		ssmall := filtermap_circSmall
 		ssmall["numPage"] = fmt.Sprint(i)
 		ideresp := fetchIde(token, i, ssmall)
+		a := ideresp.ElementList
+		for left, right := 0, len(a)-1; left < right; left, right = left+1, right-1 {
+			a[left], a[right] = a[right], a[left]
+		}
 		ds := dialect.Insert("items").Rows(
-			ideresp.ElementList,
+			a,
 		)
 		insertSQL, _, _ := ds.ToSQL()
 		rows, err := pgDB.Query(insertSQL)
@@ -136,8 +141,12 @@ func main() {
 		bbig := filtermap_circBig
 		bbig["numPage"] = fmt.Sprint(i)
 		ideresp_big := fetchIde(token, i, bbig)
+		a = ideresp_big.ElementList
+		for left, right := 0, len(a)-1; left < right; left, right = left+1, right-1 {
+			a[left], a[right] = a[right], a[left]
+		}
 		ds = dialect.Insert("items").Rows(
-			ideresp_big.ElementList,
+			a,
 		)
 		insertSQL, _, _ = ds.ToSQL()
 		rows, err = pgDB.Query(insertSQL)
